@@ -75,10 +75,14 @@ public class LocationProvider: NSObject, ObservableObject {
             }
         }
         else {
-            // no authorization set by delegate yet
+            /// no authorization set by delegate yet
             #if DEBUG
             print("No location authorization status set by delegate yet. Try to start updates anyhow.")
             #endif
+            /// In principle, this should throw an error.
+            /// However, this would prevent start() from running directly after the LocationProvider is initialized.
+            /// This is because the delegate method `didChangeAuthorization`,
+            /// setting `authorizationStatus` runs only after a brief delay after initialization.
             //throw LocationProviderError.noAuthorization
         }
         self.lm.startUpdatingLocation()
