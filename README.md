@@ -58,8 +58,10 @@ cancellableLocation = locationProvider.locationWillChange.sink { loc in
 
 The function `handleLocation` in the `sink` closure would be executed on every `CLLocation` object sent by the `LocationProvider`.
 
-Also, the `LocationProvider` is an ObservableObject which has a published property `location` that updates the ObservableObject.
-This dynamic property can directly be accessed in SwiftUI.
+Also, the `LocationProvider` is an ObservableObject which has a `@Published` property `location` that updates the ObservableObject.
+The observable `LocationProvider` and its `location` property can directly be accessed in SwiftUI.
+
+
 
 ### Stopping the MotionProvider
 
