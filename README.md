@@ -67,3 +67,13 @@ Stop the `LocationProvider` and cancel the subscription
 locationProvider.stop()
 cancellableLocation?.cancel()
 ```
+
+### Set correct properties in Info.plist
+
+In order for the app to have access to user location, the following keys should be set in `Info.plist`:
+
+* `NSLocationAlwaysAndWhenInUseUsageDescription`
+* `NSLocationAlwaysUsageDescription`
+* `NSLocationWhenInUseUsageDescription`
+
+If location access in the background is required, add `Location` to `UIBackgroundModes`.
