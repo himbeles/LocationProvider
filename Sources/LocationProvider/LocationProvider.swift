@@ -60,7 +60,7 @@ public class LocationProvider: NSObject, ObservableObject {
      */
     public func requestAuthorization(onAuthorizationDenied : ()->Void = {presentLocationSettingsAlert()}) -> Void {
         if self.authorizationStatus == CLAuthorizationStatus.denied {
-            
+            onAuthorizationDenied()
         }
         else {
             self.lm.requestWhenInUseAuthorization()
