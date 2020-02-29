@@ -59,7 +59,37 @@ cancellableLocation = locationProvider.locationWillChange.sink { loc in
 The function `handleLocation` in the `sink` closure would be executed on every `CLLocation` object sent by the `LocationProvider`.
 
 Also, the `LocationProvider` is an ObservableObject which has a `@Published` property `location` that updates the ObservableObject.
-The observable `LocationProvider` and its `location` property can directly be accessed in SwiftUI.
+The observable `LocationProvider` and its `location` property can directly be accessed in SwiftUI:
+
+```swift
+import SwiftUI
+import LocationProvider
+
+struct ContentView: View {
+    @ObservedObject var locationProvider : LocationProvider
+    
+    init() {
+        locationProvider = LocationProvider()
+        do {try locationProvider.start()} catch(LocationProviderError.noAuthorization) {
+            print("no access")
+            locationProvider.requestAuthorization()
+        } catch {print("did not start")}
+    }
+
+    var body: some View {
+        VStack{
+        Text("latitude \(locationProvider.location?.coordinate.latitude ?? 0)")
+        Text("longitude \(locationProvider.location?.coordinate.longitude ?? 0)")
+        }
+    }
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
+```
 
 
 
