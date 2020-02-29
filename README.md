@@ -13,7 +13,7 @@ via a `PassthroughSubject<CLLocation, Never>` called `locationWillChange`.
 Initialize and start the LocationProvider
 
 ```swift
-let locationProvider = LotionProvider()
+let locationProvider = LocationProvider()
 
 do {
     try locationProvider.start()
