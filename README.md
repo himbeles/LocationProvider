@@ -49,8 +49,8 @@ The default action is to present an alert that suggests to go to the app setting
 Subscribe to the `locationWillChange` subject and store the returned `Cancellable`
 
 ```swift
-cancellableLocation = locationProvider.locationWillChange.sink { md in
-    // handleLocation(motionData: md)
+cancellableLocation = locationProvider.locationWillChange.sink { loc in
+    // handleLocation(loc)
 }
 ```
 
