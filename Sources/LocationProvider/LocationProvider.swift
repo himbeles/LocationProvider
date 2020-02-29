@@ -69,8 +69,17 @@ public class LocationProvider: NSObject, ObservableObject {
     
     /// Start the Location Provider.
     public func start() throws -> Void {
-        guard self.authorizationStatus == .authorizedWhenInUse || self.authorizationStatus == .authorizedAlways else {
-            throw LocationProviderError.noAuthorization
+        if let status = self.authorizationStatus {
+            guard status == .authorizedWhenInUse || status == .authorizedAlways else {
+                throw LocationProviderError.noAuthorization
+            }
+        }
+        else {
+            // no authorization set by delegate yet
+            #if DEBUG
+            print("No location authorization status set by delegate yet. Try to start updates anyhow.")
+            #endif
+            //throw LocationProviderError.noAuthorization
         }
         self.lm.startUpdatingLocation()
     }
@@ -106,6 +115,10 @@ public enum LocationProviderError: Error {
 extension LocationProvider: CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         self.authorizationStatus = status
+        #if DEBUG
+        print("Current location authorization status set by delegate is \(status.rawValue)")
+        #endif
+        //print()
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
