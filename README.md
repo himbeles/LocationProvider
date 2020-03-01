@@ -66,10 +66,11 @@ struct ContentView: View {
     
     init() {
         locationProvider = LocationProvider()
-        do {try locationProvider.start()} catch(LocationProviderError.noAuthorization) {
-            print("no access")
+        do {try locationProvider.start()} 
+        catch(LocationProviderError.noAuthorization) {
+            print("no location access")
             locationProvider.requestAuthorization()
-        } catch {print("did not start")}
+        }
     }
 
     var body: some View {
