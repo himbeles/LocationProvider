@@ -43,7 +43,7 @@ public class LocationProvider: NSObject, ObservableObject {
         
         self.lm.delegate = self
         self.lm.desiredAccuracy = kCLLocationAccuracyBest
-        self.lm.requestWhenInUseAuthorization()
+        self.requestAuthorization()
         
         self.lm.activityType = .fitness
         self.lm.distanceFilter = 10
@@ -77,7 +77,7 @@ public class LocationProvider: NSObject, ObservableObject {
         else {
             /// no authorization set by delegate yet
             #if DEBUG
-            print("No location authorization status set by delegate yet. Try to start updates anyhow.")
+            print(#function, "No location authorization status set by delegate yet. Try to start updates anyhow.")
             #endif
             /// In principle, this should throw an error.
             /// However, this would prevent start() from running directly after the LocationProvider is initialized.
@@ -120,7 +120,7 @@ extension LocationProvider: CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         self.authorizationStatus = status
         #if DEBUG
-        print("Current location authorization status set by delegate is \(status.rawValue)")
+        print(#function, status.name)
         #endif
         //print()
     }
@@ -128,5 +128,36 @@ extension LocationProvider: CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         self.location = location
+    }
+    
+    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        if let clErr = error as? CLError {
+            switch clErr {
+            case CLError.denied : do {
+                print(#function, "Location access denied by user.")
+                self.stop()
+                self.requestAuthorization()
+            }
+            case CLError.locationUnknown : print(#function, "Location manager is unable to retrieve a location.")
+            default: print(#function, "Location manager failed with unknown CoreLocation error.")
+            }
+        }
+        else {
+            print(#function, "Location manager failed with unknown error", error.localizedDescription)
+        }
+    }
+}
+
+extension CLAuthorizationStatus {
+    /// String representation of the CLAuthorizationStatus
+    var name: String {
+        switch self {
+        case .notDetermined: return "notDetermined"
+        case .authorizedWhenInUse: return "authorizedWhenInUse"
+        case .authorizedAlways: return "authorizedAlways"
+        case .restricted: return "restricted"
+        case .denied: return "denied"
+        default: return "unknown"
+        }
     }
 }
