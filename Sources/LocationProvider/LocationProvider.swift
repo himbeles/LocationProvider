@@ -38,13 +38,18 @@ public class LocationProvider: NSObject, ObservableObject {
     /// The authorization status for CoreLocation.
     @Published public var authorizationStatus: CLAuthorizationStatus?
     
+    /// A function that is executed when the `CLAuthorizationStatus` changes to `Denied`.
+    public var onAuthorizationStatusDenied : ()->Void = {presentLocationSettingsAlert()}
+    
+    /// The LocationProvider intializer.
+    ///
+    /// Creates a CLLocationManager delegate and sets the CLLocationManager properties.
     public override init() {
         super.init()
         
         self.lm.delegate = self
-        self.lm.desiredAccuracy = kCLLocationAccuracyBest
-        self.requestAuthorization()
         
+        self.lm.desiredAccuracy = kCLLocationAccuracyBest
         self.lm.activityType = .fitness
         self.lm.distanceFilter = 10
         self.lm.allowsBackgroundLocationUpdates = true
@@ -58,9 +63,9 @@ public class LocationProvider: NSObject, ObservableObject {
      In case, the access has already been denied, execute the `onAuthorizationDenied` closure.
      The default behavior is to present an alert that suggests going to the settings page.
      */
-    public func requestAuthorization(onAuthorizationDenied : ()->Void = {presentLocationSettingsAlert()}) -> Void {
+    public func requestAuthorization() -> Void {
         if self.authorizationStatus == CLAuthorizationStatus.denied {
-            onAuthorizationDenied()
+            onAuthorizationStatusDenied()
         }
         else {
             self.lm.requestWhenInUseAuthorization()
@@ -69,6 +74,8 @@ public class LocationProvider: NSObject, ObservableObject {
     
     /// Start the Location Provider.
     public func start() throws -> Void {
+        self.requestAuthorization()
+        
         if let status = self.authorizationStatus {
             guard status == .authorizedWhenInUse || status == .authorizedAlways else {
                 throw LocationProviderError.noAuthorization
