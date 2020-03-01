@@ -24,9 +24,6 @@ catch LocationProviderError.noAuthorization {
     // handle the lack of authorization, e.g. by
     // locationProvider.requestAuthorization()
 }
-catch {
-    print("Unexpected error: \(error).")
-}
 ```
 
 Potential location access authorization errors `LocationProviderError.noAuthorization` need to be caught.
