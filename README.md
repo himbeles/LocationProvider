@@ -23,6 +23,8 @@ do {
 catch LocationProviderError.noAuthorization {
     // handle the lack of authorization, e.g. by
     // locationProvider.requestAuthorization()
+} catch {
+    print("unexpected error")
 }
 ```
 
@@ -64,9 +66,11 @@ struct ContentView: View {
     init() {
         locationProvider = LocationProvider()
         do {try locationProvider.start()} 
-        catch(LocationProviderError.noAuthorization) {
+        catch LocationProviderError.noAuthorization {
             print("no location access")
             locationProvider.requestAuthorization()
+        } catch {
+            print("unexpected error")
         }
     }
 
