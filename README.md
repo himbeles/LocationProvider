@@ -20,11 +20,9 @@ let locationProvider = LocationProvider()
 do {
     try locationProvider.start()
 }
-catch LocationProviderError.noAuthorization {
+catch {
     // handle the lack of authorization, e.g. by
     // locationProvider.requestAuthorization()
-} catch {
-    print("unexpected error")
 }
 ```
 
@@ -53,6 +51,17 @@ cancellableLocation = locationProvider.locationWillChange.sink { loc in
 
 The function `handleLocation` in the `sink` closure would be executed on every `CLLocation` object sent by the `LocationProvider`.
 
+### Stopping the MotionProvider
+
+Stop the `LocationProvider` and cancel the subscription
+
+```swift
+locationProvider.stop()
+cancellableLocation?.cancel()
+```
+
+### Usage in SwiftUI
+
 Also, the `LocationProvider` is an ObservableObject which has a `@Published` property `location` that updates the ObservableObject.
 The observable `LocationProvider` and its `location` property can directly be accessed in SwiftUI:
 
@@ -66,11 +75,9 @@ struct ContentView: View {
     init() {
         locationProvider = LocationProvider()
         do {try locationProvider.start()} 
-        catch LocationProviderError.noAuthorization {
-            print("no location access")
+        catch {
+            print("No location access.")
             locationProvider.requestAuthorization()
-        } catch {
-            print("unexpected error")
         }
     }
 
@@ -89,18 +96,7 @@ struct ContentView_Previews: PreviewProvider {
 }
 ```
 
-
-
-### Stopping the MotionProvider
-
-Stop the `LocationProvider` and cancel the subscription
-
-```swift
-locationProvider.stop()
-cancellableLocation?.cancel()
-```
-
-### Set correct properties in Info.plist
+## Set correct properties in Info.plist
 
 In order for the app to have access to user location, the following keys should be set in `Info.plist`:
 
