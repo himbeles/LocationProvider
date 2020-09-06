@@ -105,3 +105,9 @@ In order for the app to have access to user location, the following keys should 
 * `NSLocationWhenInUseUsageDescription`
 
 If location access in the background is required, add `Location` to `UIBackgroundModes`.
+
+
+## Example Code
+
+A minimum working iOS App, using LocationProvider in SwiftUI can be found here:
+https://github.com/himbeles/LocationProviderExample
