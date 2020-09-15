@@ -105,7 +105,7 @@ In order for the app to have access to user location, the following keys should 
 * `NSLocationAlwaysUsageDescription`
 * `NSLocationWhenInUseUsageDescription`
 
-If location access in the background is required, add `Location` to `UIBackgroundModes`.
+Per default, the package requests location access in the background. Therefore, also **add `Location` to `UIBackgroundModes`** in `Info.plist` or set `locationProvider.lm.allowsBackgroundLocationUpdates = false` before starting the location updates via `locationProvider.start()`.
 
 
 ## Example Code
