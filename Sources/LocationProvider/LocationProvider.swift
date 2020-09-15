@@ -19,7 +19,7 @@ import UIKit
  */
 public class LocationProvider: NSObject, ObservableObject {
     
-    private let lm = CLLocationManager()
+    public let lm = CLLocationManager()
     
     /// Is emitted when the `location` property changes.
     public let locationWillChange = PassthroughSubject<CLLocation, Never>()
