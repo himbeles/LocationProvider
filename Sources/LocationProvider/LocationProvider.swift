@@ -60,15 +60,23 @@ public class LocationProvider: NSObject, ObservableObject {
     /**
      Request location access from user.
      
+     Per default, `authorizedWhenInUse` is requested.
      In case, the access has already been denied, execute the `onAuthorizationDenied` closure.
      The default behavior is to present an alert that suggests going to the settings page.
      */
-    public func requestAuthorization() -> Void {
+    public func requestAuthorization(authorizationRequestType: CLAuthorizationStatus = .authorizedWhenInUse) -> Void {
         if self.authorizationStatus == CLAuthorizationStatus.denied {
             onAuthorizationStatusDenied()
         }
         else {
-            self.lm.requestWhenInUseAuthorization()
+            switch authorizationRequestType {
+            case .authorizedWhenInUse:
+                self.lm.requestWhenInUseAuthorization()
+            case .authorizedAlways:
+                self.lm.requestAlwaysAuthorization()
+            default:
+                print("WARNING: Only `when in use` and `always` types can be requested.")
+            }
         }
     }
     
@@ -84,7 +92,7 @@ public class LocationProvider: NSObject, ObservableObject {
         else {
             /// no authorization set by delegate yet
             #if DEBUG
-            print(#function, "No location authorization status set by delegate yet. Try to start updates anyhow.")
+            print(#function, "WARNING: No location authorization status set by delegate yet. Try to start updates anyhow.")
             #endif
             /// In principle, this should throw an error.
             /// However, this would prevent start() from running directly after the LocationProvider is initialized.
