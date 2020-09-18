@@ -35,7 +35,7 @@ The standard location access user dialog can be brought up via
 ```swift
 locationProvider.requestAuthorization()
 ```
-It requests `authorizedWhenInUse`-type access. 
+Per default, it requests `authorizedWhenInUse`-type access. 
 
 The `LocationProvider` has a property `onAuthorizationStatusDenied` that defines an action to be executed in case where location access is currently denied. 
 The default action is to present an alert (`presentLocationSettingsAlert()`) that suggests to go to the app settings screen in order to change the location settings.  
