@@ -8,7 +8,21 @@
 import Foundation
 import CoreLocation
 import Combine
+#if !os(macOS)
 import UIKit
+#endif
+
+#if os(iOS)
+public let defaultAuthorizationRequestType = CLAuthorizationStatus.authorizedWhenInUse
+#else
+public let defaultAuthorizationRequestType = CLAuthorizationStatus.authorizedAlways
+#endif
+
+#if os(iOS)
+public let allowedAuthorizationTypes : Set<CLAuthorizationStatus> = Set([.authorizedWhenInUse, .authorizedAlways])
+#elseif os(macOS)
+public let allowedAuthorizationTypes : Set<CLAuthorizationStatus> = Set([.authorized, .authorizedAlways])
+#endif
 
 /**
  A Combine-based CoreLocation provider.
@@ -17,6 +31,7 @@ import UIKit
  it provides the latest location as a published `CLLocation` object and
  via a `PassthroughSubject<CLLocation, Never>` called `locationWillChange`.
  */
+
 public class LocationProvider: NSObject, ObservableObject {
     
     public let lm = CLLocationManager()
@@ -38,6 +53,7 @@ public class LocationProvider: NSObject, ObservableObject {
     /// The authorization status for CoreLocation.
     @Published public var authorizationStatus: CLAuthorizationStatus?
     
+
     /// A function that is executed when the `CLAuthorizationStatus` changes to `Denied`.
     public var onAuthorizationStatusDenied : ()->Void = {presentLocationSettingsAlert()}
     
@@ -54,7 +70,9 @@ public class LocationProvider: NSObject, ObservableObject {
         self.lm.distanceFilter = 10
         self.lm.allowsBackgroundLocationUpdates = true
         self.lm.pausesLocationUpdatesAutomatically = false
+        #if os(iOS)
         self.lm.showsBackgroundLocationIndicator = true
+        #endif
     }
     
     /**
@@ -64,7 +82,7 @@ public class LocationProvider: NSObject, ObservableObject {
      In case, the access has already been denied, execute the `onAuthorizationDenied` closure.
      The default behavior is to present an alert that suggests going to the settings page.
      */
-    public func requestAuthorization(authorizationRequestType: CLAuthorizationStatus = .authorizedWhenInUse) -> Void {
+    public func requestAuthorization(authorizationRequestType: CLAuthorizationStatus = defaultAuthorizationRequestType) -> Void {
         if self.authorizationStatus == CLAuthorizationStatus.denied {
             onAuthorizationStatusDenied()
         }
@@ -85,7 +103,7 @@ public class LocationProvider: NSObject, ObservableObject {
         self.requestAuthorization()
         
         if let status = self.authorizationStatus {
-            guard status == .authorizedWhenInUse || status == .authorizedAlways else {
+            guard allowedAuthorizationTypes.contains(status) else {
                 throw LocationProviderError.noAuthorization
             }
         }
@@ -112,6 +130,7 @@ public class LocationProvider: NSObject, ObservableObject {
 
 /// Present an alert that suggests to go to the app settings screen.
 public func presentLocationSettingsAlert(alertText : String? = nil) -> Void {
+    #if os(iOS)
     let alertController = UIAlertController (title: "Enable Location Access", message: alertText ?? "The location access for this app is set to 'never'. Enable location access in the application settings. Go to Settings now?", preferredStyle: .alert)
     let settingsAction = UIAlertAction(title: "Settings", style: .default) { (_) -> Void in
         guard let settingsUrl = URL(string:UIApplication.openSettingsURLString) else {
@@ -123,6 +142,7 @@ public func presentLocationSettingsAlert(alertText : String? = nil) -> Void {
     let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
     alertController.addAction(cancelAction)
     UIApplication.shared.windows[0].rootViewController?.present(alertController, animated: true, completion: nil)
+    #endif
 }
 
 
