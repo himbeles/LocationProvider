@@ -52,7 +52,7 @@ cancellableLocation = locationProvider.locationWillChange.sink { loc in
 
 The function `handleLocation` in the `sink` closure would be executed on every `CLLocation` object sent by the `LocationProvider`.
 
-### Stopping the MotionProvider
+### Stopping the LocationProvider
 
 Stop the `LocationProvider` and cancel the subscription
 
