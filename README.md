@@ -112,3 +112,9 @@ Per default, the package requests location access in the background. Therefore, 
 
 A minimum working iOS App, using LocationProvider in SwiftUI can be found here:
 https://github.com/himbeles/LocationProviderExample
+
+## Support me
+If you like this package and you would like to support me,
+
+<a href="https://www.buymeacoffee.com/lri" target="_blank"><img width="120" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee"></a>
+
