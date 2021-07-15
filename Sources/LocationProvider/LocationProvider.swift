@@ -36,6 +36,9 @@ public class LocationProvider: NSObject, ObservableObject {
     
     public let lm = CLLocationManager()
     
+    private var app: UIApplication
+    private var appOpen: (URL, [UIApplication.OpenExternalURLOptionsKey : Any], ((Bool) -> Void)?) -> Void
+    
     /// Is emitted when the `location` property changes.
     public let locationWillChange = PassthroughSubject<CLLocation, Never>()
     
@@ -53,17 +56,15 @@ public class LocationProvider: NSObject, ObservableObject {
     /// The authorization status for CoreLocation.
     @Published public var authorizationStatus: CLAuthorizationStatus?
     
-
-    /// A function that is executed when the `CLAuthorizationStatus` changes to `Denied`.
-    public var onAuthorizationStatusDenied : ()->Void = {presentLocationSettingsAlert()}
     
     /// The LocationProvider intializer.
     ///
     /// Creates a CLLocationManager delegate and sets the CLLocationManager properties.
-    public override init() {
-        super.init()
+    public init(app: UIApplication, appOpen: @escaping (URL, [UIApplication.OpenExternalURLOptionsKey : Any], ((Bool) -> Void)?) -> Void) {
         
-        self.lm.delegate = self
+        self.app = app
+        self.appOpen = appOpen
+        
         
         self.lm.desiredAccuracy = kCLLocationAccuracyBest
         self.lm.activityType = .fitness
@@ -73,7 +74,13 @@ public class LocationProvider: NSObject, ObservableObject {
         #if os(iOS)
         self.lm.showsBackgroundLocationIndicator = true
         #endif
+        super.init()
+        self.lm.delegate = self
+
     }
+    
+    /// A function that is executed when the `CLAuthorizationStatus` changes to `Denied`.
+    public func onAuthorizationStatusDenied() {presentLocationSettingsAlert(app: self.app, appOpen: self.appOpen)}
     
     /**
      Request location access from user.
@@ -129,19 +136,19 @@ public class LocationProvider: NSObject, ObservableObject {
 }
 
 /// Present an alert that suggests to go to the app settings screen.
-public func presentLocationSettingsAlert(alertText : String? = nil) -> Void {
+public func presentLocationSettingsAlert(app: UIApplication, appOpen: @escaping (URL, [UIApplication.OpenExternalURLOptionsKey : Any], ((Bool) -> Void)?) -> Void, alertText : String? = nil) -> Void {
     #if os(iOS)
     let alertController = UIAlertController (title: "Enable Location Access", message: alertText ?? "The location access for this app is set to 'never'. Enable location access in the application settings. Go to Settings now?", preferredStyle: .alert)
     let settingsAction = UIAlertAction(title: "Settings", style: .default) { (_) -> Void in
         guard let settingsUrl = URL(string:UIApplication.openSettingsURLString) else {
             return
         }
-        UIApplication.shared.open(settingsUrl)
+        appOpen(settingsUrl, [:], nil)
     }
     alertController.addAction(settingsAction)
     let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
     alertController.addAction(cancelAction)
-    UIApplication.shared.windows[0].rootViewController?.present(alertController, animated: true, completion: nil)
+    app.windows[0].rootViewController?.present(alertController, animated: true, completion: nil)
     #endif
 }
 
