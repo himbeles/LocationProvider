@@ -31,7 +31,7 @@ public let allowedAuthorizationTypes : Set<CLAuthorizationStatus> = Set([.author
  it provides the latest location as a published `CLLocation` object and
  via a `PassthroughSubject<CLLocation, Never>` called `locationWillChange`.
  */
-
+@available(iOSApplicationExtension, unavailable)
 public class LocationProvider: NSObject, ObservableObject {
     
     public let lm = CLLocationManager()
@@ -129,6 +129,7 @@ public class LocationProvider: NSObject, ObservableObject {
 }
 
 /// Present an alert that suggests to go to the app settings screen.
+@available(iOSApplicationExtension, unavailable)
 public func presentLocationSettingsAlert(alertText : String? = nil) -> Void {
     #if os(iOS)
     let alertController = UIAlertController (title: "Enable Location Access", message: alertText ?? "The location access for this app is set to 'never'. Enable location access in the application settings. Go to Settings now?", preferredStyle: .alert)
@@ -151,6 +152,7 @@ public enum LocationProviderError: Error {
     case noAuthorization
 }
 
+@available(iOSApplicationExtension, unavailable)
 extension LocationProvider: CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         self.authorizationStatus = status
